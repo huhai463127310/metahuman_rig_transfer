@@ -3,17 +3,19 @@ import maya.api.OpenMaya as om
 import os 
 
 #Enter Wrapped Head Mesh Name below
-enter_wrapped_mesh_name = "NewHead"
+enter_wrapped_mesh_name = "SWAN_head"
 
 #Enter folder path below where additional scripts are stored. Do not change slash to forward slash
-folder_path = "C:\Maya\Journalist\scripts"
+folder_path = "D:\git\metahuman_rig_transfer"
 python_folder_path = folder_path.replace("\\", "/")
 
 #Alright lets go
 
-
-cmds.select( clear=True )
-cmds.duplicate('DHIhead:spine_04')
+def renameRigLogicNode():
+    nodes = list(filter(lambda x:x.find("rl4Embedded") > -1, cmds.listConnections("CTRL_expressions")))
+    if len(nodes) > 0:
+        rl4EmbeddedNode = nodes[0]
+        cmds.rename(rl4EmbeddedNode, "rigLogicNode")
 
 def select_loop_bones():
     from maya import cmds
@@ -50,9 +52,6 @@ def select_loop_bones():
         execfile('%s/Set_Bone_Data.py'%python_folder_path)
         
         boneID = boneID+1
-
-select_loop_bones()
-cmds.select( clear=True )
 
 def move_constraint():
     #move neck_01 parent bone
@@ -109,9 +108,6 @@ def move_constraint():
 
     FACIAL_C_FacialRootB_XF = cmds.xform(FACIAL_C_FacialRootB,q=1,ws=1,t=1)
     cmds.move( FACIAL_C_FacialRootB_XF[0], FACIAL_C_FacialRootB_XF[1], FACIAL_C_FacialRootB_XF[2], FACIAL_C_FacialRootDHIB, absolute=True, ws=True )
-
-move_constraint()
-cmds.select( clear=True )
 
 def rl4_node_op():
 
@@ -215,7 +211,17 @@ def rl4_node_op():
         
         
         bone_TransformID = bone_TransformID+1
-        
+
+cmds.select( clear=True )
+cmds.duplicate('DHIhead:spine_04')
+renameRigLogicNode()
+
+select_loop_bones()
+cmds.select( clear=True )
+
+move_constraint()
+cmds.select( clear=True )
+
 rl4_node_op()
 cmds.select( clear=True )
 cmds.delete('spine_04')
